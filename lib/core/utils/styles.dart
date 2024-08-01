@@ -4,8 +4,8 @@ abstract class Styles {
 
 
   static TextStyle appbar = const TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
     color: Colors.white
   );
 

@@ -17,13 +17,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int currentIndex = 0;
+  bool isBottomSheetShown = false;
+  IconData fabIcon = Icons.edit;
+  var scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     createDatabase();
     super.initState();
   }
+
   List screens = [
-   const NEWTaskScreen(),
+    const NEWTaskScreen(),
     const DoneTaskScreen(),
     const ArchivedTaskScreen()
   ];
@@ -32,10 +36,11 @@ class _HomeScreenState extends State<HomeScreen> {
     'Done Tasks',
     'Archive Tasks',
   ];
-late Database database;
+  late Database database;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: scaffoldKey,
         appBar: AppBar(
           backgroundColor: Colors.blue,
           title: Text(titles[currentIndex], style: Styles.appbar),
@@ -44,9 +49,25 @@ late Database database;
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.blue,
           onPressed: () {
-            insertToDatabase();
+            if (isBottomSheetShown) {
+              Navigator.of(context).pop();
+              isBottomSheetShown = false;
+              setState(() {
+                fabIcon = Icons.edit;
+              });
+            } else {
+              scaffoldKey.currentState!.showBottomSheet((context) => Container(
+                    width: double.infinity,
+                    height: 50,
+                    color: Colors.blue,
+                  ));
+              isBottomSheetShown = true;
+              setState(() {
+                fabIcon = Icons.add;
+              });
+            }
           },
-          child: const Icon(Icons.add),
+          child: Icon(fabIcon),
         ),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
@@ -75,36 +96,31 @@ late Database database;
         ));
   }
 
-
-  void createDatabase() async
-  {
-     database = await openDatabase(
-      'ToDo.db',
-      version: 1,
-      onCreate: (database,version) {
-        database.execute('create Table ToDo (id INTEGER PRIMARY KEY ,title TEXT ,date TEXT,time TEXT,status TEXT)')
-            .then((value){
-              print('done');
-        })
-            .catchError((error){
-              print('error is ${error.toString()}');
-        });
-      },
-      onOpen: (database){
-        print('done 2');
-      }
-    );
+  void createDatabase() async {
+    database = await openDatabase('ToDo.db', version: 1,
+        onCreate: (database, version) {
+      database
+          .execute(
+              'create Table ToDo (id INTEGER PRIMARY KEY ,title TEXT ,date TEXT,time TEXT,status TEXT)')
+          .then((value) {
+        print('done');
+      }).catchError((error) {
+        print('error is ${error.toString()}');
+      });
+    }, onOpen: (database) {
+      print('done 2');
+    });
   }
 
-  void insertToDatabase() async
-  {
-   await database.transaction((txn) async{
-      txn.rawInsert('INSERT INTO ToDo (title,date,time,status) VALUES ("new task","2022-12-12","12:12:12","new")')
-      .then((value){
+  void insertToDatabase() async {
+    await database.transaction((txn) async {
+      txn
+          .rawInsert(
+              'INSERT INTO ToDo (title,date,time,status) VALUES ("new task","2022-12-12","12:12:12","new")')
+          .then((value) {
         print('$value inserted successfully');
-      }).catchError((onError){});
+      }).catchError((onError) {});
       return null;
     });
-
   }
 }
