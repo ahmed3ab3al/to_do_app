@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'Done Tasks',
     'Archive Tasks',
   ];
-
+late Database database;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.blue,
           onPressed: () {
+            insertToDatabase();
           },
           child: const Icon(Icons.add),
         ),
@@ -77,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void createDatabase() async
   {
-    var database = await openDatabase(
+     database = await openDatabase(
       'ToDo.db',
       version: 1,
       onCreate: (database,version) {
@@ -93,5 +94,17 @@ class _HomeScreenState extends State<HomeScreen> {
         print('done 2');
       }
     );
+  }
+
+  void insertToDatabase() async
+  {
+   await database.transaction((txn) async{
+      txn.rawInsert('INSERT INTO ToDo (title,date,time,status) VALUES ("new task","2022-12-12","12:12:12","new")')
+      .then((value){
+        print('$value inserted successfully');
+      }).catchError((onError){});
+      return null;
+    });
+
   }
 }
