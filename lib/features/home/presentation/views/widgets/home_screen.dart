@@ -126,7 +126,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 elevation: 30
-              );
+              ).closed.then((value) {
+                isBottomSheetShown = false;
+                setState(() {
+                  fabIcon = Icons.edit;
+                });
+              });
               isBottomSheetShown = true;
               setState(() {
                 fabIcon = Icons.add;
