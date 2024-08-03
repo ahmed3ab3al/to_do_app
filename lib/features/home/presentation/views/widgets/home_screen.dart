@@ -43,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'Archive Tasks',
   ];
   late Database database;
+  List<Map> tasks = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,7 +180,10 @@ class _HomeScreenState extends State<HomeScreen> {
         print('error is ${error.toString()}');
       });
     }, onOpen: (database) {
-      print('done 2');
+      print('opened');
+     getDataFromDatabase(database).then((value) {
+       tasks = value;
+     });
     });
   }
 
@@ -193,5 +197,9 @@ class _HomeScreenState extends State<HomeScreen> {
       }).catchError((onError) {});
       return null;
     });
+  }
+
+  Future<List<Map>> getDataFromDatabase(database) async {
+   return await database.rawQuery('SELECT * FROM ToDo');
   }
 }
