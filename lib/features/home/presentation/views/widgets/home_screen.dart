@@ -3,11 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:to_do_app/core/widgets/custom_loading_item.dart';
 import 'package:to_do_app/core/widgets/custom_text_form_field.dart';
 import 'package:to_do_app/features/archived_tasks/presentation/views/widgets/archived_task_screen.dart';
 import 'package:to_do_app/features/done_tasks/presentation/views/widgets/done_task_screen.dart';
-import 'package:to_do_app/features/new_tasks/presentation/views/widgets/new_task_screen.dart';
+import 'package:to_do_app/features/new_tasks/presentation/views/widgets/new_task_screen_body.dart';
 
+import '../../../../../constants.dart';
 import '../../../../../core/utils/styles.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -33,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List screens = [
-    const NEWTaskScreen(),
+    const NewTaskScreenBody(),
     const DoneTaskScreen(),
     const ArchivedTaskScreen()
   ];
@@ -43,91 +45,102 @@ class _HomeScreenState extends State<HomeScreen> {
     'Archive Tasks',
   ];
   late Database database;
-  List<Map> tasks = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         key: scaffoldKey,
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.blue.withOpacity(.75),
           title: Text(titles[currentIndex], style: Styles.appbar),
         ),
-        body: screens[currentIndex],
+        body: tasks.isEmpty
+            ? const CustomLoadingItem(
+                width: double.infinity, height: double.infinity)
+            : screens[currentIndex],
         floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.blue.withOpacity(.7),
           onPressed: () {
             if (isBottomSheetShown) {
               if (formKey.currentState!.validate()) {
                 insertToDatabase(
-                    title: titleController.text,
-                    date: dateController.text,
-                    time: timeController.text)
+                        title: titleController.text,
+                        date: dateController.text,
+                        time: timeController.text)
                     .then((value) {
-                  Navigator.of(context).pop();
-                  isBottomSheetShown = false;
-                  setState(() {
-                    fabIcon = Icons.edit;
+                  getDataFromDatabase(database).then((value) {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      isBottomSheetShown = false;
+                      fabIcon = Icons.edit;
+                      tasks = value;
+                    });
                   });
                 });
               }
-
             } else {
-              scaffoldKey.currentState!.showBottomSheet((context) =>
-                  Container(
-                    color: Colors.white.withOpacity(.001),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Form(
-                        key: formKey,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CustomTextFormFiled(
-                                customController: titleController,
-                                type: TextInputType.text,
-                                label: ' Task Title',
-                                prefix: Icons.title),
-                            const SizedBox(
-                              height: 15,
+              scaffoldKey.currentState!
+                  .showBottomSheet(
+                      (context) => Container(
+                            color: Colors.white.withOpacity(.001),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Form(
+                                key: formKey,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CustomTextFormFiled(
+                                        customController: titleController,
+                                        type: TextInputType.text,
+                                        label: ' Task Title',
+                                        prefix: Icons.title),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    CustomTextFormFiled(
+                                        customController: timeController,
+                                        type: TextInputType.datetime,
+                                        label: ' Task Time',
+                                        prefix: Icons.watch_later_outlined,
+                                        onTap: () {
+                                          showTimePicker(
+                                                  context: context,
+                                                  initialTime: TimeOfDay.now())
+                                              .then((value) {
+                                            timeController.text = value!
+                                                .format(context)
+                                                .toString();
+                                          });
+                                        }),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    CustomTextFormFiled(
+                                        customController: dateController,
+                                        type: TextInputType.datetime,
+                                        label: ' Task Date',
+                                        prefix: Icons.calendar_today,
+                                        onTap: () {
+                                          showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime.now(),
+                                                  lastDate: DateTime.parse(
+                                                      '2025-12-31'))
+                                              .then((value) {
+                                            dateController.text =
+                                                DateFormat.yMMMd()
+                                                    .format(value!);
+                                          });
+                                        }),
+                                  ],
+                                ),
+                              ),
                             ),
-                            CustomTextFormFiled(
-                                customController: timeController,
-                                type: TextInputType.datetime,
-                                label: ' Task Time',
-                                prefix: Icons.watch_later_outlined,
-                              onTap: () {
-                                  showTimePicker(context: context,
-                                      initialTime: TimeOfDay.now())
-                                      .then((value) {
-                                        timeController.text = value!.format(context).toString();
-                                      });
-                              }
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            CustomTextFormFiled(
-                                customController: dateController,
-                                type: TextInputType.datetime,
-                                label: ' Task Date',
-                                prefix: Icons.calendar_today,
-                              onTap: () {
-                                  showDatePicker(context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime.now(),
-                                      lastDate: DateTime.parse('2025-12-31'))
-                                      .then((value) {
-                                        dateController.text =DateFormat.yMMMd().format(value!);
-                                      });
-                              }
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                elevation: 30
-              ).closed.then((value) {
+                          ),
+                      elevation: 30)
+                  .closed
+                  .then((value) {
                 isBottomSheetShown = false;
                 setState(() {
                   fabIcon = Icons.edit;
@@ -181,13 +194,13 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }, onOpen: (database) {
       print('opened');
-     getDataFromDatabase(database).then((value) {
-       tasks = value;
-     });
     });
   }
 
-  Future insertToDatabase({required String title, required String date, required String time}) async {
+  Future insertToDatabase(
+      {required String title,
+      required String date,
+      required String time}) async {
     return await database.transaction((txn) async {
       txn
           .rawInsert(
@@ -200,6 +213,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<List<Map>> getDataFromDatabase(database) async {
-   return await database.rawQuery('SELECT * FROM ToDo');
+    return await database.rawQuery('SELECT * FROM ToDo');
   }
 }
