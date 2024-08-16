@@ -4,6 +4,7 @@ import 'package:to_do_app/core/widgets/build_task_item.dart';
 import 'package:to_do_app/features/home/presentation/view_models/cubit/cubit.dart';
 
 import '../../../../core/utils/colors.dart';
+import '../../../../core/widgets/no_tasks_view.dart';
 import '../../../home/presentation/view_models/cubit/states.dart';
 
 class NewTaskScreen extends StatelessWidget {
@@ -14,6 +15,9 @@ class NewTaskScreen extends StatelessWidget {
     return BlocConsumer<HomeCubit, HomeStates>(
       listener: (context, state) {},
       builder: (context, state) {
+        if (HomeCubit.get(context).newTasks.isEmpty) {
+          return const NoTasksView();
+        }
         return ListView.separated(
             itemBuilder: (context, index) => BuildTaskItem(
                   newTaskModel: HomeCubit.get(context).newTasks[index],
