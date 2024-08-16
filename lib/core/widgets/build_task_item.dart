@@ -13,58 +13,66 @@ class BuildTaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Row(
-        children: [
-          CircleAvatar(
-              radius: 40,
-              backgroundColor: Colors.blue.withOpacity(.8),
-              child: Text(
-                newTaskModel['time'],
-                style: const TextStyle(color: Colors.white),
-              )),
-          const SizedBox(
-            width: 20,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(newTaskModel['title'], style: Styles.title),
-                Text(
-                  newTaskModel['date'],
-                  style: Styles.subtitle,
-                ),
-              ],
+    return Dismissible(
+      key: Key(newTaskModel['id'].toString()),
+      onDismissed: (direction) {
+        HomeCubit.get(context).deleteData(
+          id: newTaskModel['id'],
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.blue.withOpacity(.8),
+                child: Text(
+                  newTaskModel['time'],
+                  style: const TextStyle(color: Colors.white),
+                )),
+            const SizedBox(
+              width: 20,
             ),
-          ),
-          const SizedBox(
-            width: 15,
-          ),
-          IconButton(
-              onPressed: () {
-                HomeCubit.get(context).updateData(
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(newTaskModel['title'], style: Styles.title),
+                  Text(
+                    newTaskModel['date'],
+                    style: Styles.subtitle,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              width: 15,
+            ),
+            IconButton(
+                onPressed: () {
+                  HomeCubit.get(context).updateData(
                     status: 'done',
                     id: newTaskModel['id'],
-                   );
-              },
-              icon: const Icon(
-                Icons.check_box,
-                color: Colors.lightGreen,
-              )),
-          IconButton(
-              onPressed: () {
-                HomeCubit.get(context).updateData(
+                  );
+                },
+                icon: const Icon(
+                  Icons.check_box,
+                  color: Colors.lightGreen,
+                )),
+            IconButton(
+                onPressed: () {
+                  HomeCubit.get(context).updateData(
                     status: 'archive',
                     id: newTaskModel['id'],
-                   );
-              },
-              icon: const Icon(
-                Icons.archive_outlined,
-                color: Colors.black45,
-              )),
-        ],
+                  );
+                },
+                icon: const Icon(
+                  Icons.archive_outlined,
+                  color: Colors.black45,
+                )),
+          ],
+        ),
       ),
     );
   }

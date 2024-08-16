@@ -76,23 +76,19 @@ class HomeCubit extends Cubit<HomeStates> {
     });
   }
 
-  void getDataFromDatabase(database)  {
-
+  void getDataFromDatabase(database) {
     newTasks = [];
     doneTasks = [];
     archivedTasks = [];
 
-
     emit(GetDatabaseLoadingState());
     database.rawQuery('SELECT * FROM ToDo').then((value) {
-
       value.forEach((element) {
-        if(element['status'] == 'new') {
+        if (element['status'] == 'new') {
           newTasks.add(element);
-        } else if(element['status'] == 'done') {
+        } else if (element['status'] == 'done') {
           doneTasks.add(element);
-        }
-        else {
+        } else {
           archivedTasks.add(element);
         }
       });
@@ -113,6 +109,17 @@ class HomeCubit extends Cubit<HomeStates> {
     });
   }
 
+  void deleteData({
+    required int id,
+  }) async {
+    database.rawUpdate(
+      'DELETE FROM ToDo WHERE id = ? ',
+      [ id],
+    ).then((value) {
+      getDataFromDatabase(database);
+      emit(DeleteDatabaseState());
+    });
+  }
 
   void changeBottomSheetState({
     required bool isShow,

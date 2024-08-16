@@ -15,3 +15,5 @@ class ChangeBottomSheetState extends HomeStates {}
 class GetDatabaseLoadingState extends HomeStates {}
 
 class UpdateDatabaseState extends HomeStates {}
+
+class DeleteDatabaseState extends HomeStates {}

@@ -11,23 +11,22 @@ class ArchivedTaskScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-return BlocConsumer<HomeCubit, HomeStates>(
-  listener: (context, state) {
-
-  },
-  builder: (context, state) {
-    return ListView.separated(
-    itemBuilder: (context, index) => BuildTaskItem(
-      newTaskModel: HomeCubit.get(context).archivedTasks[index],
-    ),
-    separatorBuilder: (context, index) => Padding(
-      padding: const EdgeInsetsDirectional.only(start: 20),
-      child: Container(
-          height: 1,
-          color: ColorManager.greyColor,
-          width: double.infinity),
-    ),
-    itemCount: HomeCubit.get(context).archivedTasks.length);
-  },
-);  }
+    return BlocConsumer<HomeCubit, HomeStates>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        return ListView.separated(
+            itemBuilder: (context, index) => BuildTaskItem(
+                  newTaskModel: HomeCubit.get(context).archivedTasks[index],
+                ),
+            separatorBuilder: (context, index) => Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 20),
+                  child: Container(
+                      height: 1,
+                      color: ColorManager.greyColor,
+                      width: double.infinity),
+                ),
+            itemCount: HomeCubit.get(context).archivedTasks.length);
+      },
+    );
+  }
 }

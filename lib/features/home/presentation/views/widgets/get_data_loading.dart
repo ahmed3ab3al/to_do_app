@@ -14,8 +14,7 @@ class GetLoading extends StatelessWidget {
       listener: (context, state) {},
       builder: (context, state) {
         return ListView.separated(
-          itemBuilder: (context, index) =>
-          const Padding(
+          itemBuilder: (context, index) => const Padding(
             padding: EdgeInsets.all(20),
             child: Row(
               children: [
@@ -40,18 +39,16 @@ class GetLoading extends StatelessWidget {
               ],
             ),
           ),
-          separatorBuilder: (context, index) =>
-              Padding(
-                padding: const EdgeInsetsDirectional.only(start: 20),
-                child: Container(
-                    height: 1,
-                    color: ColorManager.greyColor,
-                    width: double.infinity),
-              ),
+          separatorBuilder: (context, index) => Padding(
+            padding: const EdgeInsetsDirectional.only(start: 20),
+            child: Container(
+                height: 1,
+                color: ColorManager.greyColor,
+                width: double.infinity),
+          ),
           itemCount: 6,
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-
         );
       },
     );
