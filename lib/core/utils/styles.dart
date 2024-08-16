@@ -10,5 +10,14 @@ abstract class Styles {
     color: ColorManager.whiteColor
   );
 
+  static TextStyle title =  const TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.bold
+  );
+
+  static TextStyle subtitle =  const TextStyle(
+      fontSize: 15,
+      color: Colors.grey
+  );
 }
 

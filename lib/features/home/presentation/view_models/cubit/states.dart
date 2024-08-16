@@ -7,3 +7,9 @@ class ChangeBottomNavBarState extends HomeStates {}
 class CreateDatabaseState extends HomeStates {}
 
 class GetDatabaseState extends HomeStates {}
+
+class InsertToDatabaseState extends HomeStates {}
+
+class ChangeBottomSheetState extends HomeStates {}
+
+class GetDatabaseLoadingState extends HomeStates {}

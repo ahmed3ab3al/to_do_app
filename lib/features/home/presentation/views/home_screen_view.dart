@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:to_do_app/core/utils/colors.dart';
 import 'package:to_do_app/core/widgets/custom_text_form_field.dart';
 import 'package:to_do_app/features/home/presentation/view_models/cubit/states.dart';
+import 'package:to_do_app/features/home/presentation/views/widgets/get_data_loading.dart';
 import '../../../../core/utils/styles.dart';
 import '../view_models/cubit/cubit.dart';
 
@@ -14,145 +16,123 @@ class HomeScreenView extends StatelessWidget {
   TextEditingController titleController = TextEditingController();
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
-  bool isBottomSheetShown = false;
-  IconData fabIcon = Icons.edit;
   var scaffoldKey = GlobalKey<ScaffoldState>();
   var formKey = GlobalKey<FormState>();
-
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-      HomeCubit()
-        ..createDatabase(),
+      create: (context) => HomeCubit()..createDatabase(),
       child: BlocConsumer<HomeCubit, HomeStates>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is InsertToDatabaseState) {
+            Navigator.pop(context);
+          }
+        },
         builder: (context, state) {
           return Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
               backgroundColor: Colors.blue.withOpacity(.75),
-              title: Text(HomeCubit
-                  .get(context)
-                  .titles[
-              HomeCubit
-                  .get(context)
-                  .currentIndex], style: Styles.appbar),
+              title: Text(
+                  HomeCubit.get(context)
+                      .titles[HomeCubit.get(context).currentIndex],
+                  style: Styles.appbar),
             ),
-            body:
-            // tasks.isEmpty
-            //     ? const CustomLoadingItem(
-            //     width: double.infinity, height: double.infinity)
-            //     :
-            HomeCubit
-                .get(context)
-                .screens[HomeCubit
-                .get(context)
-                .currentIndex],
+            body: state is GetDatabaseLoadingState
+                ? const GetLoading()
+                : HomeCubit.get(context)
+                    .screens[HomeCubit.get(context).currentIndex],
             floatingActionButton: FloatingActionButton(
               backgroundColor: Colors.blue.withOpacity(.7),
               onPressed: () {
-                if (isBottomSheetShown) {
+                if (HomeCubit.get(context).isBottomSheetShown) {
                   if (formKey.currentState!.validate()) {
-                    // insertToDatabase(
-                    //     title: titleController.text,
-                    //     date: dateController.text,
-                    //     time: timeController.text)
-                    //     .then((value) {
-                    //   getDataFromDatabase(database).then((value) {
-                    //     Navigator.of(context).pop();
-                    //     // setState(() {
-                    //     //   isBottomSheetShown = false;
-                    //     //   fabIcon = Icons.edit;
-                    //     //   tasks = value;
-                    //     // });
-                    //   });
-                    // });
+                    HomeCubit.get(context).insertToDatabase(
+                        title: titleController.text,
+                        date: dateController.text,
+                        time: timeController.text);
                   }
                 } else {
                   scaffoldKey.currentState!
                       .showBottomSheet(
-                          (context) =>
-                          Container(
-                            color: Colors.white.withOpacity(.001),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Form(
-                                key: formKey,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    CustomTextFormFiled(
-                                        customController: titleController,
-                                        type: TextInputType.text,
-                                        label: ' Task Title',
-                                        prefix: Icons.title),
-                                    const SizedBox(
-                                      height: 15,
+                          (context) => Container(
+                                color: Colors.white.withOpacity(.001),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Form(
+                                    key: formKey,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CustomTextFormFiled(
+                                            customController: titleController,
+                                            type: TextInputType.text,
+                                            label: ' Task Title',
+                                            prefix: Icons.title),
+                                        const SizedBox(
+                                          height: 15,
+                                        ),
+                                        CustomTextFormFiled(
+                                            customController: timeController,
+                                            type: TextInputType.datetime,
+                                            label: ' Task Time',
+                                            prefix: Icons.watch_later_outlined,
+                                            onTap: () {
+                                              showTimePicker(
+                                                      context: context,
+                                                      initialTime:
+                                                          TimeOfDay.now())
+                                                  .then((value) {
+                                                timeController.text = value!
+                                                    .format(context)
+                                                    .toString();
+                                              });
+                                            }),
+                                        const SizedBox(
+                                          height: 15,
+                                        ),
+                                        CustomTextFormFiled(
+                                            customController: dateController,
+                                            type: TextInputType.datetime,
+                                            label: ' Task Date',
+                                            prefix: Icons.calendar_today,
+                                            onTap: () {
+                                              showDatePicker(
+                                                      context: context,
+                                                      initialDate:
+                                                          DateTime.now(),
+                                                      firstDate: DateTime.now(),
+                                                      lastDate: DateTime.parse(
+                                                          '2025-12-31'))
+                                                  .then((value) {
+                                                dateController.text =
+                                                    DateFormat.yMMMd()
+                                                        .format(value!);
+                                              });
+                                            }),
+                                      ],
                                     ),
-                                    CustomTextFormFiled(
-                                        customController: timeController,
-                                        type: TextInputType.datetime,
-                                        label: ' Task Time',
-                                        prefix: Icons.watch_later_outlined,
-                                        onTap: () {
-                                          showTimePicker(
-                                              context: context,
-                                              initialTime: TimeOfDay.now())
-                                              .then((value) {
-                                            timeController.text = value!
-                                                .format(context)
-                                                .toString();
-                                          });
-                                        }),
-                                    const SizedBox(
-                                      height: 15,
-                                    ),
-                                    CustomTextFormFiled(
-                                        customController: dateController,
-                                        type: TextInputType.datetime,
-                                        label: ' Task Date',
-                                        prefix: Icons.calendar_today,
-                                        onTap: () {
-                                          showDatePicker(
-                                              context: context,
-                                              initialDate: DateTime.now(),
-                                              firstDate: DateTime.now(),
-                                              lastDate: DateTime.parse(
-                                                  '2025-12-31'))
-                                              .then((value) {
-                                            dateController.text =
-                                                DateFormat.yMMMd()
-                                                    .format(value!);
-                                          });
-                                        }),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                      elevation: 30)
+                          elevation: 30)
                       .closed
                       .then((value) {
-                    isBottomSheetShown = false;
-                    // setState(() {
-                    //   fabIcon = Icons.edit;
-                    // });
+                    HomeCubit.get(context).changeBottomSheetState(
+                        isShow: false, icon: Icons.edit);
                   });
-                  isBottomSheetShown = true;
-                  // setState(() {
-                  //   fabIcon = Icons.add;
-                  // });
+
+                  HomeCubit.get(context)
+                      .changeBottomSheetState(isShow: true, icon: Icons.add);
                 }
               },
-              child: Icon(fabIcon, color: Colors.white),
+              child: Icon(HomeCubit.get(context).fabIcon,
+                  color: ColorManager.whiteColor),
             ),
             bottomNavigationBar: BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
-              currentIndex: HomeCubit
-                  .get(context)
-                  .currentIndex,
+              currentIndex: HomeCubit.get(context).currentIndex,
               elevation: 0,
               selectedItemColor: Colors.blue,
               onTap: (index) {
@@ -178,6 +158,4 @@ class HomeScreenView extends StatelessWidget {
       ),
     );
   }
-
-
 }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-
 class CustomTextFormFiled extends StatelessWidget {
   final TextInputType type;
   final GestureTapCallback? onTap;
- final FormFieldValidator? validate;
+  final FormFieldValidator? validate;
   final IconData? prefix;
   final String? label;
   final TextEditingController customController;
@@ -37,17 +36,12 @@ class CustomTextFormFiled extends StatelessWidget {
         labelText: label,
         prefixIcon: Icon(prefix),
         prefixIconColor: Colors.blue,
-
-        border: const OutlineInputBorder(
-        ),
+        border: const OutlineInputBorder(),
         focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(
             color: Colors.blue,
           ),
-
         ),
-
-
       ),
     );
   }
