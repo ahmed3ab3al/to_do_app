@@ -7,7 +7,7 @@ import 'package:to_do_app/features/home/presentation/view_models/cubit/states.da
 
 import '../../../../archived_tasks/presentation/views/archived_task_screen.dart';
 import '../../../../done_tasks/presentation/views/done_task_screen.dart';
-import '../../../../new_tasks/presentation/views/new_task_screen_body.dart';
+import '../../../../new_tasks/presentation/views/new_task_screen.dart';
 
 class HomeCubit extends Cubit<HomeStates> {
   HomeCubit() : super(HomeInitialState());
@@ -15,14 +15,16 @@ class HomeCubit extends Cubit<HomeStates> {
   static HomeCubit get(context) => BlocProvider.of(context);
 
   int currentIndex = 0;
-  List<Map> tasks = [];
+  List<Map> newTasks = [];
+  List<Map> doneTasks = [];
+  List<Map> archivedTasks = [];
   bool isBottomSheetShown = false;
   IconData fabIcon = Icons.edit;
 
   late Database database;
 
   List<Widget> screens = [
-    const NewTaskScreenBody(),
+    const NewTaskScreen(),
     const DoneTaskScreen(),
     const ArchivedTaskScreen()
   ];
@@ -48,10 +50,7 @@ class HomeCubit extends Cubit<HomeStates> {
         print('error is ${error.toString()}');
       });
     }, onOpen: (database) {
-      getDataFromDatabase(database).then((value) {
-        tasks = value;
-        emit(GetDatabaseState());
-      });
+      getDataFromDatabase(database);
       print('opened database successfully');
     }).then((value) {
       database = value;
@@ -71,19 +70,49 @@ class HomeCubit extends Cubit<HomeStates> {
           .then((value) {
         print('$value inserted successfully');
         emit(InsertToDatabaseState());
-        getDataFromDatabase(database).then((value) {
-          tasks = value;
-          emit(GetDatabaseState());
-        });
+        getDataFromDatabase(database);
       }).catchError((onError) {});
       return null;
     });
   }
 
-  Future<List<Map>> getDataFromDatabase(database) async {
+  void getDataFromDatabase(database)  {
+
+    newTasks = [];
+    doneTasks = [];
+    archivedTasks = [];
+
+
     emit(GetDatabaseLoadingState());
-    return await database.rawQuery('SELECT * FROM ToDo');
+    database.rawQuery('SELECT * FROM ToDo').then((value) {
+
+      value.forEach((element) {
+        if(element['status'] == 'new') {
+          newTasks.add(element);
+        } else if(element['status'] == 'done') {
+          doneTasks.add(element);
+        }
+        else {
+          archivedTasks.add(element);
+        }
+      });
+      emit(GetDatabaseState());
+    });
   }
+
+  void updateData({
+    required String status,
+    required int id,
+  }) async {
+    database.rawUpdate(
+      'UPDATE ToDo SET status = ? WHERE id = ?',
+      [status, id],
+    ).then((value) {
+      getDataFromDatabase(database);
+      emit(UpdateDatabaseState());
+    });
+  }
+
 
   void changeBottomSheetState({
     required bool isShow,

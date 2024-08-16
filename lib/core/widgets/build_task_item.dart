@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/core/utils/styles.dart';
 
+import '../../features/home/presentation/view_models/cubit/cubit.dart';
+
 class BuildTaskItem extends StatelessWidget {
   final Map newTaskModel;
+
   const BuildTaskItem({
     super.key,
     required this.newTaskModel,
@@ -24,16 +27,43 @@ class BuildTaskItem extends StatelessWidget {
           const SizedBox(
             width: 20,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(newTaskModel['title'], style: Styles.title),
-              Text(
-                newTaskModel['date'],
-                style: Styles.subtitle,
-              ),
-            ],
-          )
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(newTaskModel['title'], style: Styles.title),
+                Text(
+                  newTaskModel['date'],
+                  style: Styles.subtitle,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            width: 15,
+          ),
+          IconButton(
+              onPressed: () {
+                HomeCubit.get(context).updateData(
+                    status: 'done',
+                    id: newTaskModel['id'],
+                   );
+              },
+              icon: const Icon(
+                Icons.check_box,
+                color: Colors.lightGreen,
+              )),
+          IconButton(
+              onPressed: () {
+                HomeCubit.get(context).updateData(
+                    status: 'archive',
+                    id: newTaskModel['id'],
+                   );
+              },
+              icon: const Icon(
+                Icons.archive_outlined,
+                color: Colors.black45,
+              )),
         ],
       ),
     );
