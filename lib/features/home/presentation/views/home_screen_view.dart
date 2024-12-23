@@ -52,6 +52,9 @@ class HomeScreenView extends StatelessWidget {
                         title: titleController.text,
                         date: dateController.text,
                         time: timeController.text);
+                    timeController.clear();
+                    dateController.clear();
+                    titleController.clear();
                   }
                 } else {
                   scaffoldKey.currentState!
