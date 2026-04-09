@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/modules/archived_tasks/archived_task_screen.dart';
 import 'package:to_do_app/modules/done_tasks/done_task_screen.dart';
 import 'package:to_do_app/modules/new_tasks/new_task_screen.dart';
@@ -18,6 +19,13 @@ class _HomeLayoutState extends State<HomeLayout> {
     ArchivedTaskScreen(),
   ];
   List<String> title = ["New Tasks", 'Done Tasks', 'Archived Tasks'];
+
+  @override
+  void initState() {
+    createDatabase();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +44,7 @@ class _HomeLayoutState extends State<HomeLayout> {
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         selectedItemColor: Colors.blue,
+
         onTap: (index) {
           setState(() {
             currentIndex = index;
@@ -56,4 +65,24 @@ class _HomeLayoutState extends State<HomeLayout> {
       body: screens[currentIndex],
     );
   }
+}
+
+void createDatabase() async {
+  Database database = await openDatabase(
+    'todo.db',
+    version: 1,
+    onCreate: (database, version) {
+      database
+          .execute(
+            'CREATE TABLE tasks(id INTEGER PRIMARY KEY,title TEXT,date TEXT,time TEXT,status Text)',
+          )
+          .then((value) {
+            print('database created');
+          })
+          .catchError((error) {});
+    },
+    onOpen: (database) {
+      print('database opened');
+    },
+  );
 }
