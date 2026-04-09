@@ -20,6 +20,9 @@ class _HomeLayoutState extends State<HomeLayout> {
     ArchivedTaskScreen(),
   ];
   List<String> title = ["New Tasks", 'Done Tasks', 'Archived Tasks'];
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+  bool isBottomSheetShown = false;
+  IconData fabIcon = Icons.edit;
 
   @override
   void initState() {
@@ -30,7 +33,9 @@ class _HomeLayoutState extends State<HomeLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.blue,
         title: Text(
           title[currentIndex],
@@ -65,10 +70,30 @@ class _HomeLayoutState extends State<HomeLayout> {
       ),
       body: screens[currentIndex],
       floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(),
+        backgroundColor: Colors.blue,
         onPressed: () {
-          insertToDatabase();
+          if (isBottomSheetShown) {
+            Navigator.of(context).pop();
+            isBottomSheetShown = false;
+            setState(() {
+              fabIcon = Icons.edit;
+            });
+          } else {
+            scaffoldKey.currentState!.showBottomSheet(
+              (context) => Container(
+                width: double.infinity,
+                height: 120,
+                color: Colors.red,
+              ),
+            );
+            isBottomSheetShown = true;
+            setState(() {
+              fabIcon = Icons.add;
+            });
+          }
         },
-        child: Icon(Icons.add),
+        child: Icon(fabIcon, color: Colors.white),
       ),
     );
   }
