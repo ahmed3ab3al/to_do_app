@@ -13,6 +13,7 @@ class HomeLayout extends StatefulWidget {
 
 class _HomeLayoutState extends State<HomeLayout> {
   int currentIndex = 0;
+  late Database database;
   List<Widget> screens = [
     NewTaskScreen(),
     DoneTaskScreen(),
@@ -63,26 +64,47 @@ class _HomeLayoutState extends State<HomeLayout> {
         ],
       ),
       body: screens[currentIndex],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          insertToDatabase();
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
-}
 
-void createDatabase() async {
-  Database database = await openDatabase(
-    'todo.db',
-    version: 1,
-    onCreate: (database, version) {
-      database
-          .execute(
-            'CREATE TABLE tasks(id INTEGER PRIMARY KEY,title TEXT,date TEXT,time TEXT,status Text)',
+  void createDatabase() async {
+    database = await openDatabase(
+      'todo.db',
+      version: 1,
+      onCreate: (database, version) {
+        database
+            .execute(
+              'CREATE TABLE tasks(id INTEGER PRIMARY KEY,title TEXT,date TEXT,time TEXT,status Text)',
+            )
+            .then((value) {
+              print('database created');
+            })
+            .catchError((error) {});
+      },
+      onOpen: (database) {
+        print('database opened');
+      },
+    );
+  }
+
+  void insertToDatabase() {
+    database.transaction((txn) async {
+      txn
+          .rawInsert(
+            'INSERT INTO tasks (title,date,time,status)VALUES ("new tasks","1/1/2000","16:25","new")',
           )
           .then((value) {
-            print('database created');
+            print("$value inserted successfully");
           })
-          .catchError((error) {});
-    },
-    onOpen: (database) {
-      print('database opened');
-    },
-  );
+          .catchError((error) {
+            print("error occures");
+          });
+    });
+  }
 }
