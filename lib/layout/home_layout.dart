@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/modules/archived_tasks/archived_task_screen.dart';
 import 'package:to_do_app/modules/done_tasks/done_task_screen.dart';
 import 'package:to_do_app/modules/new_tasks/new_task_screen.dart';
+import 'package:to_do_app/shared/components/components.dart';
 
 class HomeLayout extends StatefulWidget {
   const HomeLayout({super.key});
@@ -23,6 +24,9 @@ class _HomeLayoutState extends State<HomeLayout> {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
   bool isBottomSheetShown = false;
   IconData fabIcon = Icons.edit;
+  TextEditingController titleController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
 
   @override
   void initState() {
@@ -82,9 +86,61 @@ class _HomeLayoutState extends State<HomeLayout> {
           } else {
             scaffoldKey.currentState!.showBottomSheet(
               (context) => Container(
-                width: double.infinity,
-                height: 120,
-                color: Colors.red,
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomField(
+                      controller: titleController,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Title must not be empty";
+                        }
+                        return null;
+                      },
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                      type: TextInputType.text,
+                      label: "Title",
+                      prefixIcon: Icons.title,
+                    ),
+                    SizedBox(height: 15),
+                    CustomField(
+                      onTap: () {},
+                      controller: timeController,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Task Time must not be empty";
+                        }
+                        return null;
+                      },
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                      type: TextInputType.datetime,
+                      label: "Task Time",
+                      prefixIcon: Icons.watch_later_outlined,
+                    ),
+                    SizedBox(height: 15),
+                    CustomField(
+                      onTap: () {},
+                      controller: dateController,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Task Date must not be empty";
+                        }
+                        return null;
+                      },
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                      type: TextInputType.datetime,
+                      label: "Task Date",
+                      prefixIcon: Icons.calendar_month_outlined,
+                    ),
+                  ],
+                ),
               ),
             );
             isBottomSheetShown = true;
