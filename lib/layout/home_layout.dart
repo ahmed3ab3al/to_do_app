@@ -84,10 +84,16 @@ class _HomeLayoutState extends State<HomeLayout> {
         onPressed: () {
           if (isBottomSheetShown) {
             if (formKey.currentState!.validate()) {
-              Navigator.of(context).pop();
-              isBottomSheetShown = false;
-              setState(() {
-                fabIcon = Icons.edit;
+              insertToDatabase(
+                time: timeController.text,
+                title: titleController.text,
+                date: dateController.text,
+              ).then((value) {
+                Navigator.of(context).pop();
+                isBottomSheetShown = false;
+                setState(() {
+                  fabIcon = Icons.edit;
+                });
               });
             }
           } else {
@@ -199,11 +205,15 @@ class _HomeLayoutState extends State<HomeLayout> {
     );
   }
 
-  void insertToDatabase() {
-    database.transaction((txn) async {
+  Future insertToDatabase({
+    required String time,
+    required String title,
+    required String date,
+  }) async {
+    return await database.transaction((txn) async {
       txn
           .rawInsert(
-            'INSERT INTO tasks (title,date,time,status)VALUES ("new tasks","1/1/2000","16:25","new")',
+            'INSERT INTO tasks (title,date,time,status)VALUES ("$title","$date","$time","new")',
           )
           .then((value) {
             print("$value inserted successfully");
