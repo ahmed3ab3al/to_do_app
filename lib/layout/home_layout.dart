@@ -1,9 +1,13 @@
+// ignore_for_file: strict_top_level_inference, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/modules/archived_tasks/archived_task_screen.dart';
 import 'package:to_do_app/modules/done_tasks/done_task_screen.dart';
 import 'package:to_do_app/modules/new_tasks/new_task_screen.dart';
-import 'package:to_do_app/shared/components/components.dart';
+import 'package:to_do_app/shared/components/custom_text_field.dart';
+import 'package:to_do_app/shared/components/title_text_field.dart';
 
 class HomeLayout extends StatefulWidget {
   const HomeLayout({super.key});
@@ -22,6 +26,7 @@ class _HomeLayoutState extends State<HomeLayout> {
   ];
   List<String> title = ["New Tasks", 'Done Tasks', 'Archived Tasks'];
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+  GlobalKey<FormState> formKey = GlobalKey();
   bool isBottomSheetShown = false;
   IconData fabIcon = Icons.edit;
   TextEditingController titleController = TextEditingController();
@@ -78,68 +83,55 @@ class _HomeLayoutState extends State<HomeLayout> {
         backgroundColor: Colors.blue,
         onPressed: () {
           if (isBottomSheetShown) {
-            Navigator.of(context).pop();
-            isBottomSheetShown = false;
-            setState(() {
-              fabIcon = Icons.edit;
-            });
+            if (formKey.currentState!.validate()) {
+              Navigator.of(context).pop();
+              isBottomSheetShown = false;
+              setState(() {
+                fabIcon = Icons.edit;
+              });
+            }
           } else {
             scaffoldKey.currentState!.showBottomSheet(
               (context) => Container(
                 padding: EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CustomField(
-                      controller: titleController,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Title must not be empty";
-                        }
-                        return null;
-                      },
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TitleField(titleController: titleController),
+                      SizedBox(height: 15),
+                      CustomField(
+                        isReadOnly: true,
+                        onTap: () {
+                          showTime(context);
+                        },
+                        controller: timeController,
+                        validator: timeValidation,
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.blue),
+                        ),
+                        type: TextInputType.datetime,
+                        label: "Task Time",
+                        prefixIcon: Icons.watch_later_outlined,
                       ),
-                      type: TextInputType.text,
-                      label: "Title",
-                      prefixIcon: Icons.title,
-                    ),
-                    SizedBox(height: 15),
-                    CustomField(
-                      onTap: () {},
-                      controller: timeController,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Task Time must not be empty";
-                        }
-                        return null;
-                      },
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue),
+                      SizedBox(height: 15),
+                      CustomField(
+                        isReadOnly: true,
+                        onTap: () {
+                          showDate(context);
+                        },
+                        controller: dateController,
+                        validator: dateValidation,
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.blue),
+                        ),
+                        type: TextInputType.datetime,
+                        label: "Task Date",
+                        prefixIcon: Icons.calendar_month_outlined,
                       ),
-                      type: TextInputType.datetime,
-                      label: "Task Time",
-                      prefixIcon: Icons.watch_later_outlined,
-                    ),
-                    SizedBox(height: 15),
-                    CustomField(
-                      onTap: () {},
-                      controller: dateController,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Task Date must not be empty";
-                        }
-                        return null;
-                      },
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue),
-                      ),
-                      type: TextInputType.datetime,
-                      label: "Task Date",
-                      prefixIcon: Icons.calendar_month_outlined,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
@@ -152,6 +144,39 @@ class _HomeLayoutState extends State<HomeLayout> {
         child: Icon(fabIcon, color: Colors.white),
       ),
     );
+  }
+
+  String? dateValidation(value) {
+    if (value!.isEmpty) {
+      return "Task Date must not be empty";
+    }
+    return null;
+  }
+
+  Future<Null> showDate(BuildContext context) {
+    return showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.parse('2030-12-31'),
+    ).then((value) {
+      dateController.text = DateFormat.yMMMd().format(value!);
+    });
+  }
+
+  String? timeValidation(value) {
+    if (value!.isEmpty) {
+      return "Task Time must not be empty";
+    }
+    return null;
+  }
+
+  void showTime(BuildContext context) {
+    showTimePicker(context: context, initialTime: TimeOfDay.now()).then((
+      value,
+    ) {
+      timeController.text = value!.format(context).toString();
+    });
   }
 
   void createDatabase() async {

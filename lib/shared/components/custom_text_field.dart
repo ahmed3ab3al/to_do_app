@@ -8,6 +8,7 @@ class CustomField extends StatelessWidget {
   final TextEditingController controller;
   final FormFieldValidator validator;
   final GestureTapCallback? onTap;
+  final bool isReadOnly;
   const CustomField({
     super.key,
     required this.controller,
@@ -17,6 +18,7 @@ class CustomField extends StatelessWidget {
     required this.label,
     required this.prefixIcon,
     this.onTap,
+    required this.isReadOnly,
   });
 
   @override
@@ -28,9 +30,14 @@ class CustomField extends StatelessWidget {
         labelText: label,
         focusedBorder: border,
         enabledBorder: border,
+        focusedErrorBorder: border,
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red),
+        ),
         floatingLabelStyle: TextStyle(color: Colors.blue),
       ),
       onTap: onTap,
+      readOnly: isReadOnly,
       keyboardType: type,
       controller: controller,
       validator: validator,
