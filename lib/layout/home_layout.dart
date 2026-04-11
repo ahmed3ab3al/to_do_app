@@ -97,50 +97,58 @@ class _HomeLayoutState extends State<HomeLayout> {
               });
             }
           } else {
-            scaffoldKey.currentState!.showBottomSheet(
-              (context) => Container(
-                padding: EdgeInsets.all(20),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TitleField(titleController: titleController),
-                      SizedBox(height: 15),
-                      CustomField(
-                        isReadOnly: true,
-                        onTap: () {
-                          showTime(context);
-                        },
-                        controller: timeController,
-                        validator: timeValidation,
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
-                        ),
-                        type: TextInputType.datetime,
-                        label: "Task Time",
-                        prefixIcon: Icons.watch_later_outlined,
+            scaffoldKey.currentState!
+                .showBottomSheet(
+                  (context) => Container(
+                    padding: EdgeInsets.all(20),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TitleField(titleController: titleController),
+                          SizedBox(height: 15),
+                          CustomField(
+                            isReadOnly: true,
+                            onTap: () {
+                              showTime(context);
+                            },
+                            controller: timeController,
+                            validator: timeValidation,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.blue),
+                            ),
+                            type: TextInputType.datetime,
+                            label: "Task Time",
+                            prefixIcon: Icons.watch_later_outlined,
+                          ),
+                          SizedBox(height: 15),
+                          CustomField(
+                            isReadOnly: true,
+                            onTap: () {
+                              showDate(context);
+                            },
+                            controller: dateController,
+                            validator: dateValidation,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.blue),
+                            ),
+                            type: TextInputType.datetime,
+                            label: "Task Date",
+                            prefixIcon: Icons.calendar_month_outlined,
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 15),
-                      CustomField(
-                        isReadOnly: true,
-                        onTap: () {
-                          showDate(context);
-                        },
-                        controller: dateController,
-                        validator: dateValidation,
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
-                        ),
-                        type: TextInputType.datetime,
-                        label: "Task Date",
-                        prefixIcon: Icons.calendar_month_outlined,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            );
+                )
+                .closed
+                .then((value) {
+                  isBottomSheetShown = false;
+                  setState(() {
+                    fabIcon = Icons.edit;
+                  });
+                });
             isBottomSheetShown = true;
             setState(() {
               fabIcon = Icons.add;
