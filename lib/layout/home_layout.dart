@@ -27,6 +27,7 @@ class _HomeLayoutState extends State<HomeLayout> {
   List<String> title = ["New Tasks", 'Done Tasks', 'Archived Tasks'];
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
   GlobalKey<FormState> formKey = GlobalKey();
+  List<Map<dynamic, dynamic>> tasks = [];
   bool isBottomSheetShown = false;
   IconData fabIcon = Icons.edit;
   TextEditingController titleController = TextEditingController();
@@ -208,7 +209,10 @@ class _HomeLayoutState extends State<HomeLayout> {
             .catchError((error) {});
       },
       onOpen: (database) {
-        print('database opened');
+        getDataFromDataBase(database).then((value) {
+          tasks = value;
+          print(tasks);
+        });
       },
     );
   }
@@ -230,5 +234,9 @@ class _HomeLayoutState extends State<HomeLayout> {
             print("error occures");
           });
     });
+  }
+
+  Future<List<Map>> getDataFromDataBase(database) async {
+    return await database.rawQuery('SELECT * FROM tasks');
   }
 }
