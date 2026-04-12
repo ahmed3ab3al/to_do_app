@@ -7,6 +7,7 @@ import 'package:to_do_app/modules/archived_tasks/archived_task_screen.dart';
 import 'package:to_do_app/modules/done_tasks/done_task_screen.dart';
 import 'package:to_do_app/modules/new_tasks/new_task_screen.dart';
 import 'package:to_do_app/shared/components/custom_text_field.dart';
+import 'package:to_do_app/shared/components/get_loading.dart';
 import 'package:to_do_app/shared/components/title_text_field.dart';
 import 'package:to_do_app/shared/constants.dart';
 
@@ -78,7 +79,7 @@ class _HomeLayoutState extends State<HomeLayout> {
           ),
         ],
       ),
-      body: tasks.isEmpty ? CircularProgressIndicator() : screens[currentIndex],
+      body: tasks.isEmpty ? GetLoading() : screens[currentIndex],
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         backgroundColor: Colors.blue,
