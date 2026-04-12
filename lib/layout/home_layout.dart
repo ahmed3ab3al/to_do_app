@@ -90,10 +90,13 @@ class _HomeLayoutState extends State<HomeLayout> {
                 title: titleController.text,
                 date: dateController.text,
               ).then((value) {
-                Navigator.of(context).pop();
-                isBottomSheetShown = false;
-                setState(() {
-                  fabIcon = Icons.edit;
+                getDataFromDataBase(database).then((value) {
+                  Navigator.of(context).pop();
+                  isBottomSheetShown = false;
+                  setState(() {
+                    fabIcon = Icons.edit;
+                    tasks = value;
+                  });
                 });
               });
             }
@@ -208,15 +211,7 @@ class _HomeLayoutState extends State<HomeLayout> {
             })
             .catchError((error) {});
       },
-      onOpen: (database) {
-        getDataFromDataBase(database).then((value) {
-          setState(() {
-            tasks = value;
-          });
-          print(tasks);
-          print('opened');
-        });
-      },
+      onOpen: (database) {},
     );
   }
 
