@@ -8,6 +8,7 @@ import 'package:to_do_app/modules/done_tasks/done_task_screen.dart';
 import 'package:to_do_app/modules/new_tasks/new_task_screen.dart';
 import 'package:to_do_app/shared/components/custom_text_field.dart';
 import 'package:to_do_app/shared/components/title_text_field.dart';
+import 'package:to_do_app/shared/constants.dart';
 
 class HomeLayout extends StatefulWidget {
   const HomeLayout({super.key});
@@ -27,7 +28,6 @@ class _HomeLayoutState extends State<HomeLayout> {
   List<String> title = ["New Tasks", 'Done Tasks', 'Archived Tasks'];
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
   GlobalKey<FormState> formKey = GlobalKey();
-  List<Map<dynamic, dynamic>> tasks = [];
   bool isBottomSheetShown = false;
   IconData fabIcon = Icons.edit;
   TextEditingController titleController = TextEditingController();
@@ -78,7 +78,7 @@ class _HomeLayoutState extends State<HomeLayout> {
           ),
         ],
       ),
-      body: screens[currentIndex],
+      body: tasks.isEmpty ? CircularProgressIndicator() : screens[currentIndex],
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         backgroundColor: Colors.blue,
@@ -210,8 +210,11 @@ class _HomeLayoutState extends State<HomeLayout> {
       },
       onOpen: (database) {
         getDataFromDataBase(database).then((value) {
-          tasks = value;
+          setState(() {
+            tasks = value;
+          });
           print(tasks);
+          print('opened');
         });
       },
     );
