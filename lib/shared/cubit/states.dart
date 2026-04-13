@@ -8,6 +8,8 @@ class CreateDataState extends AppStates {}
 
 class GetDataState extends AppStates {}
 
+class GetDataLoadingState extends AppStates {}
+
 class InsertDataState extends AppStates {}
 
 class BottomsheetChangeState extends AppStates {}

@@ -4,7 +4,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/modules/archived_tasks/archived_task_screen.dart';
 import 'package:to_do_app/modules/done_tasks/done_task_screen.dart';
 import 'package:to_do_app/modules/new_tasks/new_task_screen.dart';
-import 'package:to_do_app/shared/constants.dart';
 import 'package:to_do_app/shared/cubit/states.dart';
 
 class AppCubit extends Cubit<AppStates> {
@@ -53,22 +52,32 @@ class AppCubit extends Cubit<AppStates> {
     });
   }
 
-  Future insertToDatabase({
+  void insertToDatabase({
     required String time,
     required String title,
     required String date,
   }) async {
-    return await database.transaction((txn) async {
-      txn
-          .rawInsert(
-            'INSERT INTO tasks (title,date,time,status)VALUES ("$title","$date","$time","new")',
-          )
-          .then((value) {})
-          .catchError((error) {});
-    });
+    await database
+        .transaction((txn) async {
+          txn
+              .rawInsert(
+                'INSERT INTO tasks (title,date,time,status)VALUES ("$title","$date","$time","new")',
+              )
+              .then((value) {})
+              .catchError((error) {});
+        })
+        .then((value) {
+          emit(InsertDataState());
+
+          getDataFromDataBase(database).then((value) {
+            tasks = value;
+            emit(GetDataState());
+          });
+        });
   }
 
   Future<List<Map>> getDataFromDataBase(database) async {
+    emit(GetDataLoadingState());
     return await database.rawQuery('SELECT * FROM tasks');
   }
 

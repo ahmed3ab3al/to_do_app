@@ -2,10 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/shared/components/custom_text_field.dart';
 import 'package:to_do_app/shared/components/get_loading.dart';
-import 'package:to_do_app/shared/constants.dart';
 import 'package:to_do_app/shared/cubit/cubit.dart';
 import 'package:to_do_app/shared/cubit/states.dart';
 
@@ -23,7 +21,11 @@ class HomeLayout extends StatelessWidget {
     return BlocProvider(
       create: (context) => AppCubit()..createDatabase(),
       child: BlocConsumer<AppCubit, AppStates>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is InsertDataState) {
+            Navigator.of(context).pop();
+          }
+        },
         builder: (context, state) {
           return Scaffold(
             key: scaffoldKey,
@@ -58,7 +60,7 @@ class HomeLayout extends StatelessWidget {
                 ),
               ],
             ),
-            body: AppCubit.get(context).tasks.isEmpty
+            body: state is GetDataLoadingState
                 ? GetLoading()
                 : AppCubit.get(context).screens[AppCubit.get(
                     context,
@@ -69,6 +71,11 @@ class HomeLayout extends StatelessWidget {
               onPressed: () {
                 if (AppCubit.get(context).isBottomSheetShown) {
                   if (formKey.currentState!.validate()) {
+                    AppCubit.get(context).insertToDatabase(
+                      time: timeController.text,
+                      title: titleController.text,
+                      date: dateController.text,
+                    );
                     // insertToDatabase(
                     //   time: timeController.text,
                     //   title: titleController.text,
