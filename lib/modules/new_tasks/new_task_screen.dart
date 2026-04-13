@@ -8,17 +8,18 @@ class NewTaskScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: (context, index) => TaskItem(tasks[index]),
-      separatorBuilder: (context, index) => Padding(
-        padding: const EdgeInsetsDirectional.only(start: 20),
-        child: Container(
-          color: Colors.grey[300],
-          width: double.infinity,
-          height: 1,
-        ),
-      ),
-      itemCount: tasks.length,
-    );
+    return Container();
+    // ListView.separated(
+    //   itemBuilder: (context, index) => TaskItem(tasks[index]),
+    //   separatorBuilder: (context, index) => Padding(
+    //     padding: const EdgeInsetsDirectional.only(start: 20),
+    //     child: Container(
+    //       color: Colors.grey[300],
+    //       width: double.infinity,
+    //       height: 1,
+    //     ),
+    //   ),
+    //   itemCount: tasks.length,
+    // );
   }
 }
