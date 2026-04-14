@@ -22,7 +22,7 @@ class TaskItem extends StatelessWidget {
               backgroundColor: Colors.blue,
               child: Text(
                 '${taskModel['time']}',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white, fontSize: 20),
               ),
             ),
             SizedBox(width: 15),
@@ -33,16 +33,16 @@ class TaskItem extends StatelessWidget {
                 children: [
                   Text(
                     '${taskModel['title']}',
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     '${taskModel['date']}',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.grey, fontSize: 15),
                   ),
                 ],
               ),
             ),
-            SizedBox(width: 20),
+            SizedBox(width: 14),
             IconButton(
               onPressed: () {
                 AppCubit.get(
