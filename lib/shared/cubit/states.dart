@@ -10,6 +10,8 @@ class GetDataState extends AppStates {}
 
 class UpdateDataState extends AppStates {}
 
+class DeleteDataState extends AppStates {}
+
 class GetDataLoadingState extends AppStates {}
 
 class InsertDataState extends AppStates {}

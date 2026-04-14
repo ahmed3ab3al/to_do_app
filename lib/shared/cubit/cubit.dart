@@ -21,7 +21,9 @@ class AppCubit extends Cubit<AppStates> {
   ];
   int currentIndex = 0;
   List<String> title = ["New Tasks", 'Done Tasks', 'Archived Tasks'];
-  List<Map> tasks = [];
+  List<Map> newTasks = [];
+  List<Map> doneTasks = [];
+  List<Map> archivedTasks = [];
 
   void changeBottomNav(int index) {
     currentIndex = index;
@@ -41,10 +43,7 @@ class AppCubit extends Cubit<AppStates> {
             .catchError((error) {});
       },
       onOpen: (database) {
-        getDataFromDataBase(database).then((value) {
-          tasks = value;
-          emit(GetDataState());
-        });
+        getDataFromDataBase(database);
       },
     ).then((value) {
       database = value;
@@ -69,24 +68,44 @@ class AppCubit extends Cubit<AppStates> {
         .then((value) {
           emit(InsertDataState());
 
-          getDataFromDataBase(database).then((value) {
-            tasks = value;
-            emit(GetDataState());
-          });
+          getDataFromDataBase(database);
         });
   }
 
   void updateData({required String status, required int id}) {
     database
-        .rawUpdate('UPDATE tasks SET status = ? WHERE id = ?', ['$status,$id'])
+        .rawUpdate('UPDATE tasks SET status = ? WHERE id = ?', [status, id])
         .then((value) {
+          getDataFromDataBase(database);
           emit(UpdateDataState());
         });
   }
 
-  Future<List<Map>> getDataFromDataBase(database) async {
+  void deleteData({required int id}) {
+    database.rawDelete('DELETE from tasks WHERE id = ?', [id]).then((value) {
+      getDataFromDataBase(database);
+      emit(DeleteDataState());
+    });
+  }
+
+  void getDataFromDataBase(Database database) async {
     emit(GetDataLoadingState());
-    return await database.rawQuery('SELECT * FROM tasks');
+    archivedTasks = [];
+    doneTasks = [];
+    newTasks = [];
+    database.rawQuery('SELECT * FROM tasks').then((value) {
+      for (var e in value) {
+        if (e['status'] == 'new') {
+          newTasks.add(e);
+        } else if (e['status'] == 'done') {
+          doneTasks.add(e);
+        } else {
+          archivedTasks.add(e);
+        }
+      }
+
+      emit(GetDataState());
+    });
   }
 
   void changeSheetShown({required bool isShown, required IconData icon}) {
