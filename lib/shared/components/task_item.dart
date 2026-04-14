@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors_in_immutables
 
 import 'package:flutter/material.dart';
+import 'package:to_do_app/shared/cubit/cubit.dart';
 
 class TaskItem extends StatelessWidget {
   final Map taskModel;
@@ -21,19 +22,38 @@ class TaskItem extends StatelessWidget {
             ),
           ),
           SizedBox(width: 15),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${taskModel['title']}',
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                '${taskModel['date']}',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${taskModel['title']}',
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '${taskModel['date']}',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 20),
+          IconButton(
+            onPressed: () {
+              AppCubit.get(
+                context,
+              ).updateData(status: 'done', id: taskModel['id']);
+            },
+            icon: Icon(Icons.check_box, color: Colors.green),
+          ),
+          IconButton(
+            onPressed: () {
+              AppCubit.get(
+                context,
+              ).updateData(status: 'archived', id: taskModel['id']);
+            },
+            icon: Icon(Icons.archive, color: Colors.black45),
           ),
         ],
       ),
